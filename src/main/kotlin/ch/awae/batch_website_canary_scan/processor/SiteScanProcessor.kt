@@ -14,24 +14,25 @@ class SiteScanProcessor : ItemProcessor<ScanJob, ScanJob> {
     override fun process(item: ScanJob): ScanJob? {
         logger.info("processing $item")
         logger.info("fetching page content for URL ${item.url}")
-        try {
-            val result = RestTemplate().getForObject(item.url, String::class.java)
-
-            if (result == null) {
-                logger.warn("empty result")
+        val result =
+            try {
+                RestTemplate().getForObject(item.url, String::class.java)!!
+            } catch (ex: Throwable) {
+                logger.warn("unexpected error", ex)
                 return item
             }
 
-            if (result.contains(item.text)) {
-                logger.info("found required text '${item.text}'")
-                return null
-            }
-
-            logger.warn("required text '${item.text}' not found on page!")
-            return item
-        } catch (ex: Throwable) {
-            logger.warn("unexpected error", ex)
-            return item
+        val missingStrings = item.text.filter {
+            logger.info("testing for string '$it'")
+            !result.contains(it)
         }
+
+        if (missingStrings.isEmpty()) {
+            logger.info("all tests succeeded")
+            return null
+        }
+
+        logger.warn("${missingStrings.size} test(s) failed: $missingStrings")
+        return item.copy(text = missingStrings)
     }
 }

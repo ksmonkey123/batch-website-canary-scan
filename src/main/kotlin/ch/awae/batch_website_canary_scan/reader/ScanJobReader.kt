@@ -18,7 +18,8 @@ class ScanJobReader(@Value("\${batch.scan-file}") scanFile: String) : ListItemRe
                 .map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .map { it.split(' ', limit = 2) }
-                .map { ScanJob(it[0], it[1]) }
+                .groupBy({ it[0] }, { it[1] })
+                .map { ScanJob(it.key, it.value) }
         }
     }
 

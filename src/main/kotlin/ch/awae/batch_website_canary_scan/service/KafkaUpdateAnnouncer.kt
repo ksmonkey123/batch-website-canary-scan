@@ -18,12 +18,9 @@ class KafkaUpdateAnnouncer(
     private val logger = Logger.getLogger(javaClass.name)
 
     fun announceError(scanJob: ScanJob) {
-        val message = """
-            Website scan failed!
-            
-            URL: ${scanJob.url}
-            Text: ${scanJob.text}
-        """.trimIndent()
+        val message = "Website scan failed!\n\n" +
+                "URL: ${scanJob.url}\nText:" +
+                scanJob.text.fold("") { acc, s -> "$acc\n - $s" }
 
         logger.info("sending message: \"${message.replace("\n", "\\n")}\"")
         try {
