@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    disabled: true
+
+batch-meta:
+  datasource:
+    url: ${BATCH_META_DB_URL}
+    username: ${BATCH_META_DB_USER}
+    password: ${BATCH_META_DB_PASSWORD}
+
+batch:
+  scan-file: ${SCAN_FILE}
+  kafka:
+    topic: ${KAFKA_TOPIC}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+logging:
+  level:
+    org.apache.kafka.clients.producer.ProducerConfig: WARN
