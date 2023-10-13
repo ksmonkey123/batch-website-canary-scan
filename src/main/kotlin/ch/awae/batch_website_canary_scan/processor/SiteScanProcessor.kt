@@ -12,6 +12,14 @@ class SiteScanProcessor : ItemProcessor<ScanJob, ScanJob> {
     private val logger = LoggerFactory.getLogger(SiteScanProcessor::class.java)
 
     override fun process(item: ScanJob): ScanJob? {
+        val initialResult = scan(item) ?: return null
+        logger.warn("scan failed. retrying after delay...")
+        Thread.sleep(5000)
+        logger.info("retrying...")
+        return scan(initialResult)
+    }
+
+    private fun scan(item: ScanJob): ScanJob? {
         logger.info("processing $item")
         logger.info("fetching page content for URL ${item.url}")
         val result =
